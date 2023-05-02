@@ -1,16 +1,28 @@
 import RatingService from "../services/rating.service";
+import ReviewService from "../services/review.service"; /* Added by Nigel*/
 import {useState} from "react";
 
 export const SongModal = (props) => {
     const {setShowSongModal, song} = props
+    const [newSongReview, setNewSongReview] = useState(undefined)
     const [newSongRating, setNewSongRating] = useState(undefined)
+    
     const handleSongRatingChange = event => {
         setNewSongRating(event.target.value)
+    }
+    
+    const handleSongReviewChange = event => {
+        setNewSongReview(event.target.value)
     }
 
     const handleSubmitSongRating = async () => {
         await RatingService.postRating(newSongRating, song.songID)
     }
+
+    const handleSubmitSongReview = async () => {
+        await ReviewService.postReview(newSongReview, song.songID)
+    }
+
     return (
         <div style={{
             left: 0,
@@ -79,8 +91,19 @@ export const SongModal = (props) => {
                         <h5 style={{marginTop: '1rem'}}>Add Review Here</h5>
                         <div style={{display: 'flex', flexDirection: 'column'}}>
                             <input style={{width: '100%', height: '5rem'}} />
+                            <input  id={song.songID}
+                                    name="songReviewInput"
+                                    type="text"
+                                    value={newSongReview}
+                                    onChange={handleSongReviewChange} />
+                            <button onClick={handleSubmitSongReview}>Submit Review</button>
+                        </div>
+                        {/*
+                        <div style={{display: 'flex', flexDirection: 'column'}}>
+                            <input style={{width: '100%', height: '5rem'}} />
                             <button>Submit Review</button>
                         </div>
+                        */}
                     </div>
                 </div>
 
