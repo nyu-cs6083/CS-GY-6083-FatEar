@@ -1,9 +1,17 @@
+import { useEffect, useState } from "react";
 import AuthService from "../services/auth.service";
 import {Navigate} from "react-router-dom";
+import FriendService from "../services/friend.service";
 
 const Home = () => {
     const currentUser = AuthService.getCurrentUser();
+    const [friendReviews, setFriendReviews] = useState([])
 
+    useEffect(async()=>{
+        const reviews = await FriendService.getFriendReviews()
+        setFriendReviews(reviews)
+    },[])
+console.log(friendReviews)
     if (!currentUser) {
         return <Navigate to="/login" replace={true} />;
     }
@@ -35,8 +43,18 @@ return (<div style={{display: 'flex', justifyContent: 'space-between', width: '1
             <h3>
                 Newsfeed
             </h3>
-            <div id={'friends'} style={{height: '30vh'}}>
+            <div id={'friends'} style={{height: 'fit-content'}}>
                 <h5>Friends News</h5>
+                {friendReviews && friendReviews.map((review)=>{
+                    return(
+                        <div>
+                            <p>{review.reviewText}</p>
+                            <p>{review.title}</p>
+                            <p>{review.username}</p>
+                            <p>{review.reviewDate.slice(0,10)}</p>
+                        </div>
+                    )
+                })}
             </div>
             <div id={'followers'}>
                 <h5>Followers News</h5>

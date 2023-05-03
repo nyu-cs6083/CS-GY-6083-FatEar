@@ -7,7 +7,8 @@ import AuthService from './services/auth.service';
 
 import Login from './components/Login';
 import Register from './components/Register';
-import Search from './components/Search'
+import Search from './components/Search';
+import People from './components/People'
 
 import EventBus from './common/EventBus';
 import Home from "./components/Home";
@@ -64,6 +65,11 @@ const App = () => {
               <FontAwesomeIcon  style={{marginTop: '12px', marginRight: '16px', color: 'lightgrey'}} icon={faUser} />
             </li>
             <li className="nav-item">
+            <Link to={'/people'} className="nav-link">
+              Users
+            </Link>
+            </li>
+            <li className="nav-item">
               <a href="/login" className="nav-link" onClick={logOut}>
                 LogOut
               </a>
@@ -92,6 +98,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/people" element={<People />} />
         </Routes>
       </div>
     </div>
