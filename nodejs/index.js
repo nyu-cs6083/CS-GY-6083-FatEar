@@ -172,8 +172,8 @@ app.post('/friend/decline', async (req, res, next) => {
 // GET route to get reviews for users' friends
 app.get('/friend/reviews', async(req,res,next)=>{
   try {
-    const {user} = req.query
-    const results = await FriendService.newReviewsByFriends(user)
+    const username = req.user.username;
+    const results = await FriendService.newReviewsByFriends(username)
     res.json(results)
   } catch (error) {
     console.error(e);

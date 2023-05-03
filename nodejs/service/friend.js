@@ -68,7 +68,8 @@ const declineFriend = async (user1, user2) => {
 // Usecase 3a - Function to get new reviews made by a user's friends
 const newReviewsByFriends = async (user) => {
   try {
-    const reviewByfriends =  await db.getDBObject() .query("SET @user = '"+user+"'; SET @LastLogin = (SELECT lastlogin FROM  users WHERE username = @USER); SELECT * FROM reviewSong WHERE username IN ( SELECT user2 FROM friend WHERE acceptStatus = 'Accepted' AND user1 = @user UNION SELECT user1 FROM friend WHERE acceptStatus = 'Accepted' AND user2 = @user)AND reviewDate > @Lastlogin;");
+    const reviewByfriends =  await db.getDBObject().query(`SELECT * FROM reviewSong NATURAL JOIN song WHERE username IN ( SELECT user2 FROM friend WHERE acceptStatus = 'Accepted' AND user1 = "${user}" UNION SELECT user1 FROM friend ` +
+                                                          `WHERE acceptStatus = 'Accepted' AND user2 = "${user}")AND reviewDate >= (SELECT lastlogin FROM  users WHERE username = "${user}") ORDER BY reviewDate DESC;`)
     
     console.log(reviewByfriends)
     

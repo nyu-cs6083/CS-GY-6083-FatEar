@@ -8,8 +8,12 @@ const postFriend = async ({user1, user2}) => {
   return data;
 }
 
-const FriendService = {
-  postFriend
+const getFriendReviews = async () => {
+  const {data} = await axios.get(`${API_URL}friend/reviews`,{ headers: authHeader() })
+  console.log(data)
+  return data;
 }
+
+const FriendService = {postFriend,getFriendReviews}
 
 export default FriendService; 
