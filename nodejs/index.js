@@ -154,7 +154,7 @@ app.post('/friend/accept', async (req, res, next) => {
   }
 });
 
-// POST rout to decline friend request
+// POST route to decline friend request
 app.post('/friend/decline', async (req, res, next) => {
   try {
     const {
@@ -184,8 +184,8 @@ app.get('/friend/reviews', async(req,res,next)=>{
 // GET route to get reviews from people users follows
 app.get('/follows/reviews', async(req,res,next)=>{
   try {
-    const {user} = req.query
-    const results = await FollowService.newReviewsByFollowedUsers(user)
+    const username = req.user.username;
+    const results = await FollowService.newReviewsByFollowedUsers(username)
     res.json(results)
   } catch (error) {
     console.error(e);
@@ -196,8 +196,8 @@ app.get('/follows/reviews', async(req,res,next)=>{
 // GET route to get new songs by artists user is fan of
 app.get('/artist/favorite/newsongs', async(req,res,next)=>{
   try {
-    const {user} = req.query
-    const results = await artistService.getNewSongsByFavoriteArtist(user)
+    const username = req.user.username;
+    const results = await artistService.getNewSongsByFavoriteArtist(username)
     res.json(results)
   } catch (error) {
     console.error(e);

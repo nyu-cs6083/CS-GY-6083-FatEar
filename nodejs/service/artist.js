@@ -6,7 +6,7 @@ const InternalServerError = require('../errors/internalServerError');
 const getNewSongsByFavoriteArtist = async (user) => {
 
   try {
-    const newSongs =  await db.getDBObject() .query("SET @user = '"+user+"'; SET @LastLogin = (SELECT lastlogin FROM  users WHERE username = @USER); SELECT * FROM song s JOIN artistPerformsSong a ON s.songID = a.songID WHERE a.artistID IN (SELECT artistID FROM userFanOfArtist WHERE username = @user) AND s.releaseDate > @LastLogin;");
+    const newSongs =  await db.getDBObject() .query(`SELECT * FROM song s JOIN artistPerformsSong a ON s.songID = a.songID WHERE a.artistID IN (SELECT artistID FROM userFanOfArtist WHERE username = "${user}") AND s.releaseDate >= (SELECT lastlogin FROM  users WHERE username = "${user}");`);
     
     console.log(newSongs)
     

@@ -27,12 +27,13 @@ const follow = async (follower, follows) => {
 //  Usecase 3a - Function to get new reviews made by people whom user follows
 const newReviewsByFollowedUsers = async (user) => {
   try {
-    const reviewByfriends =  await db.getDBObject() .query("SET @user = '"+user+"'; SET @LastLogin = (SELECT lastlogin FROM  users WHERE username = @USER); SELECT * FROM reviewSong WHERE username IN (SELECT followed FROM follows WHERE follower = @user )AND reviewDate > @Lastlogin;");
+    const reviewByFollows =  await db.getDBObject().query(`SELECT * FROM reviewSong NATURAL JOIN song ` + 
+                                                          `WHERE username IN ( SELECT followed FROM follows WHERE follower = "${user}") AND reviewDate >= (SELECT lastlogin FROM  users WHERE username = "${user}") ORDER BY reviewDate DESC;`)
     
-    console.log(reviewByfriends)
+    console.log(reviewByFollows)
     
-    return reviewByfriends;
-    
+    return reviewByFollows;
+
   } catch (e) {
 
     console.error(e)

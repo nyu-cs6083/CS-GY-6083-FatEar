@@ -8,8 +8,12 @@ const postFollow = async ({follower, follows}) => {
   return data;
 }
 
-const FollowService = {
-  postFollow
+const getFollowsReviews = async () => {
+  const {data} = await axios.get(`${API_URL}follows/reviews`,{ headers: authHeader() })
+  console.log(data)
+  return data;
 }
+
+const FollowService = {postFollow, getFollowsReviews}
 
 export default FollowService; 
