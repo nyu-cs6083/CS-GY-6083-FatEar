@@ -66,6 +66,22 @@ app.get('/search', async(req,res,next)=>{
 })
 
 
+// Added by Nigel
+// Need to create a get rating
+app.get('/rating/:songID', async (req,res, next) => {
+  try {
+    // console.log({req})
+  const {songID} = req.params
+  // console.log(req.headers)
+  const songRatings = await RatingService.getSongRatings(Number(songID))
+  //console.log(songRatings)
+  res.json(songRatings)
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+})
+
 // all routes defined after this middleware requires auth token
 app.use(AuthMiddleWare.loginAuth);
 
@@ -80,6 +96,15 @@ app.get('/user', async (req,res, next) => {
     next(e);
   }
 })
+
+
+
+
+
+// Added by Nigel
+// Need to create a get review
+
+
 
 // Added by Nigel
 // Needs to be modified to post a rating

@@ -7,8 +7,15 @@ const postRating = async (songRating, songID) => {
   return data;
 }
 
+const getRating = async (songID) => {
+  console.log(songID)
+  const {data} = await axios.get(`${API_URL}rating/${songID}`,{ headers: authHeader() })
+  console.log(data)
+  return data;
+};
+
 const RatingService = {
-  postRating
+  postRating, getRating
 }
 
 export default RatingService;

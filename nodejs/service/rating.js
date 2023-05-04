@@ -3,6 +3,7 @@ const db = require('../db/main');
 const InternalServerError = require('../errors/internalServerError');
 
 // Nigel: Do I just need to pass the stars and ratingDate? Can I access the username and songID through a variable?
+// UPDATE: to catch for duplicate rating using SQL query from Whatsapp 
 const insertRating = async (username, songID, stars) => {
   try {
     const ratingDate = new Date()
@@ -32,6 +33,29 @@ const insertRating = async (username, songID, stars) => {
   }
 };
 
-module.exports = {
-  insertRating
+
+const getSongRatings = async (song) => {
+  try {
+    console.log(song)
+    const ratingRow = await db
+      .getDBObject()
+      .query(
+        'SELECT songID, avgRating FROM (SELECT songID, AVG(stars) as avgRating FROM ?? GROUP BY songID) as avgSongRatings WHERE songID = ?',
+        [db.RateSongTable, song]
+      );
+    if (ratingRow.length == 0) {
+      throw new Error('Song ratings not found');
+    }
+    console.log(ratingRow)
+    return ratingRow;
+  } catch (e) {
+    console.error('unable to find ratings');
+    console.error(e);
+    //throw new UserNotFound(); // Got rid of special error message bc no time to write
+  }
 };
+
+
+module.exports = {
+  insertRating, getSongRatings
+}

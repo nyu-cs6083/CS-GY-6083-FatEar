@@ -1,12 +1,26 @@
 import RatingService from "../services/rating.service";
-import ReviewService from "../services/review.service"; /* Added by Nigel*/
-import {useState} from "react";
+import ReviewService from "../services/review.service"; // Nigel
+import {useEffect, useState} from "react";
+import { isUndefined, isEmpty } from "lodash";
+
 
 export const SongModal = (props) => {
     const {setShowSongModal, song} = props
     const [newSongReview, setNewSongReview] = useState(undefined)
     const [newSongRating, setNewSongRating] = useState(undefined)
-    
+    const [songRatings, setSongRatings] = useState(undefined) // Nigel
+    console.log(songRatings)
+    // Nigel
+    useEffect(async()=>{
+            console.log(song)
+            const ratings = await RatingService.getRating(song.songID)
+            console.log(ratings)
+            setSongRatings(ratings[0])
+
+    },[])
+
+    console.log(song)
+
     const handleSongRatingChange = event => {
         setNewSongRating(event.target.value)
     }
@@ -62,7 +76,7 @@ export const SongModal = (props) => {
                         <span>Song URL: <a href={song.songURL}>Listen</a></span>
                         <span>Artist URL: <a href={song.artistURL}>Learn More</a></span>
                         {/*Need to get song rating for this song*/}
-                        <h4 style={{marginTop: '1rem'}}>Average Song Rating:</h4>
+                        <h4 style={{marginTop: '1rem'}}>Average Song Rating:{!isEmpty(songRatings) && songRatings.avgRating}</h4>
                         {/*Nigel: frontend trigger for rating a song and reviewing a song*/}
                         {/* treat the rate button as a front end trigger and add an input box next to it that*/}
                         {/* the rate button sends the value from to the backend.*/}
@@ -85,13 +99,15 @@ export const SongModal = (props) => {
                         border: '2px solid cornflowerblue'
                     }}>
                         <h4>Song Reviews</h4>
+                        {/*Need to replace with logic to get song reviews*/}
+                        return (<p>{res.songReview}</p>)
                         <p>Amazing song...</p>
                         <p>Amazing song...</p>
                         <p>Amazing song...</p>
                         <h5 style={{marginTop: '1rem'}}>Add Review Here</h5>
                         <div style={{display: 'flex', flexDirection: 'column'}}>
-                            <input style={{width: '100%', height: '5rem'}} />
-                            <input  id={song.songID}
+                            <input  style={{width: '100%', height: '5rem'}}
+                                    id={song.songID}
                                     name="songReviewInput"
                                     type="text"
                                     value={newSongReview}
