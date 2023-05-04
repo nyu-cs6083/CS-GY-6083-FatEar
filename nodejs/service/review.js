@@ -32,6 +32,27 @@ const insertReview = async (username, songID, reviewText) => {
   }
 };
 
+const getSongReview = async (song) => {
+  try {
+    console.log(song)
+    const review = await db
+      .getDBObject()
+      .query(
+        'SELECT songID, reviewText FROM ?? WHERE songID = ?',
+        [db.ReviewSongTable, song]
+      );
+    if (review.length == 0) {
+      throw new Error('Song reviews not found');
+    }
+    console.log(review)
+    return review;
+  } catch (e) {
+    console.error('unable to find ratings');
+    console.error(e);
+
+  }
+};
+
 module.exports = {
-  insertReview
+  insertReview, getSongReview
 };

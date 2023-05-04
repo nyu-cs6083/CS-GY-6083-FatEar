@@ -36,7 +36,7 @@ const insertRating = async (username, songID, stars) => {
 
 const getSongRatings = async (song) => {
   try {
-    console.log(song)
+    // console.log(song)
     const ratingRow = await db
       .getDBObject()
       .query(
@@ -46,7 +46,7 @@ const getSongRatings = async (song) => {
     if (ratingRow.length == 0) {
       throw new Error('Song ratings not found');
     }
-    console.log(ratingRow)
+    // console.log(ratingRow)
     return ratingRow;
   } catch (e) {
     console.error('unable to find ratings');

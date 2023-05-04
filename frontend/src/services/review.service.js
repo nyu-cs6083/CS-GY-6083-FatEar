@@ -9,8 +9,15 @@ const postReview = async (songReview, songID) => {
   return data;
 }
 
+const getReview = async (songID) => {
+  console.log(songID)
+  const {data} = await axios.get(`${API_URL}review/${songID}`,{ headers: authHeader() })
+  console.log(data)
+  return data;
+};
+
 const ReviewService = {
-  postReview
+  postReview, getReview
 }
 
 export default ReviewService;

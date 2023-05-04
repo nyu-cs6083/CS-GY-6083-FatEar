@@ -82,6 +82,22 @@ app.get('/rating/:songID', async (req,res, next) => {
   }
 })
 
+// Added by Nigel
+// Need to create a get rating
+app.get('/review/:songID', async (req,res, next) => {
+  try {
+    // console.log({req})
+  const {songID} = req.params
+  // console.log(req.headers)
+  const songReviews = await ReviewService.getSongReview(Number(songID))
+  //console.log(songRatings)
+  res.json(songReviews)
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+})
+
 // all routes defined after this middleware requires auth token
 app.use(AuthMiddleWare.loginAuth);
 

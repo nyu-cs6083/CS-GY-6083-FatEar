@@ -9,17 +9,25 @@ export const SongModal = (props) => {
     const [newSongReview, setNewSongReview] = useState(undefined)
     const [newSongRating, setNewSongRating] = useState(undefined)
     const [songRatings, setSongRatings] = useState(undefined) // Nigel
-    console.log(songRatings)
+    const [songReviews, setSongReviews] = useState([]) // Nigel
+
     // Nigel
     useEffect(async()=>{
-            console.log(song)
+            // console.log(song)
             const ratings = await RatingService.getRating(song.songID)
-            console.log(ratings)
+            // console.log(ratings)
             setSongRatings(ratings[0])
 
     },[])
 
-    console.log(song)
+    useEffect(async()=>{
+        console.log(song)
+        const reviews = await ReviewService.getReview(song.songID)
+        console.log(reviews)
+        setSongReviews(reviews)
+
+    },[])
+
 
     const handleSongRatingChange = event => {
         setNewSongRating(event.target.value)
@@ -99,11 +107,16 @@ export const SongModal = (props) => {
                         border: '2px solid cornflowerblue'
                     }}>
                         <h4>Song Reviews</h4>
-                        {/*Need to replace with logic to get song reviews*/}
-                        return (<p>{res.songReview}</p>)
+                        <p>{songReviews.map((res, idx) => {
+                        return (<tr key={idx}>
+                            <td>{res.reviewText}</td>
+                        </tr>)
+                        })}</p>
+                        {/*
                         <p>Amazing song...</p>
                         <p>Amazing song...</p>
                         <p>Amazing song...</p>
+                        */}
                         <h5 style={{marginTop: '1rem'}}>Add Review Here</h5>
                         <div style={{display: 'flex', flexDirection: 'column'}}>
                             <input  style={{width: '100%', height: '5rem'}}

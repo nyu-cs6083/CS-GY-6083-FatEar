@@ -8,9 +8,9 @@ const postRating = async (songRating, songID) => {
 }
 
 const getRating = async (songID) => {
-  console.log(songID)
+  // console.log(songID)
   const {data} = await axios.get(`${API_URL}rating/${songID}`,{ headers: authHeader() })
-  console.log(data)
+  // console.log(data)
   return data;
 };
 
