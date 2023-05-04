@@ -91,6 +91,30 @@ const newReviewsByFriends = async (user) => {
 };
 
 
+// Usecase 6a - Function to retrieve all friend requests
+const getFriendRequests = async (user) => {
+  try {
+    const friendRequests =  await db.getDBObject().query(`SELECT u.username, u.fname, u.lname, u.email, f.createdAt FROM friend f JOIN  users u ON f.user1 = u.username `+
+                                                          `WHERE f.user2 = "${user}" AND f.acceptStatus = 'Pending';`)
+    
+    console.log(friendRequests)
+    
+    return friendRequests;
+
+  } catch (e) {
+
+    console.error(e)
+    console.error('Unable to get all friend requests')
+
+    if (!(e instanceof ExtendableError)) {
+      console.error(e);
+      throw new InternalServerError();
+    }
+    
+    throw e;
+  }
+};
+
 module.exports = {
-  inviteFriend, acceptFriend, declineFriend, newReviewsByFriends
+  inviteFriend, getFriendRequests, acceptFriend, declineFriend, newReviewsByFriends
 };

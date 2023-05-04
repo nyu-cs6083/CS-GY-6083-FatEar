@@ -10,6 +10,7 @@ const PeopleService = require('./service/people');
 const FollowService = require('./service/follow');
 const FriendService = require('./service/friend');
 const artistService = require('./service/artist');
+const SongsService = require('./service/songs');
 const errorHandler = require("./middleware/errorHandler");
 const morgan = require('morgan');
 
@@ -111,12 +112,14 @@ app.get('/people', async(req,res,next)=>{
 
 // POST route to follow user
 app.post('/follow', async (req, res, next) => {
+
+  const currentUser = req.user.username;
+
   try {
     const {
-        follower,
-        follows
+        username
     } = req.body;
-    const postFollow = await FollowService.follow(follower, follows);
+    const postFollow = await FollowService.follow(currentUser, username);
     res.json(postFollow);
   } catch (e) {
     console.error(e);
@@ -126,12 +129,14 @@ app.post('/follow', async (req, res, next) => {
 
 // POST route to send friend request
 app.post('/friend/invite', async (req, res, next) => {
+
+  const currentUser = req.user.username;
+
   try {
     const {
-        user1,
-        user2
+        username
     } = req.body;
-    const postFriend = await FriendService.inviteFriend(user1, user2);
+    const postFriend = await FriendService.inviteFriend(currentUser, username);
     res.json(postFriend);
   } catch (e) {
     console.error(e);
@@ -141,12 +146,14 @@ app.post('/friend/invite', async (req, res, next) => {
 
 // POST route to accept friend request
 app.post('/friend/accept', async (req, res, next) => {
+
+  const currentUser = req.user.username;
+
   try {
     const {
-        user1,
-        user2
+        username
     } = req.body;
-    const postFriend = await FriendService.acceptFriend(user1, user2);
+    const postFriend = await FriendService.acceptFriend(username, currentUser);
     res.json(postFriend);
   } catch (e) {
     console.error(e);
@@ -156,12 +163,14 @@ app.post('/friend/accept', async (req, res, next) => {
 
 // POST route to decline friend request
 app.post('/friend/decline', async (req, res, next) => {
+  
+  const currentUser = req.user.username;
+
   try {
     const {
-        user1,
-        user2
+        username
     } = req.body;
-    const postFriend = await FriendService.declineFriend(user1, user2);
+    const postFriend = await FriendService.declineFriend(username, currentUser);
     res.json(postFriend);
   } catch (e) {
     console.error(e);
@@ -172,8 +181,8 @@ app.post('/friend/decline', async (req, res, next) => {
 // GET route to get reviews for users' friends
 app.get('/friend/reviews', async(req,res,next)=>{
   try {
-    const username = req.user.username;
-    const results = await FriendService.newReviewsByFriends(username)
+    const currentUser = req.user.username;
+    const results = await FriendService.newReviewsByFriends(currentUser)
     res.json(results)
   } catch (error) {
     console.error(e);
@@ -184,8 +193,8 @@ app.get('/friend/reviews', async(req,res,next)=>{
 // GET route to get reviews from people users follows
 app.get('/follows/reviews', async(req,res,next)=>{
   try {
-    const username = req.user.username;
-    const results = await FollowService.newReviewsByFollowedUsers(username)
+    const currentUser = req.user.username;
+    const results = await FollowService.newReviewsByFollowedUsers(currentUser)
     res.json(results)
   } catch (error) {
     console.error(e);
@@ -196,10 +205,86 @@ app.get('/follows/reviews', async(req,res,next)=>{
 // GET route to get new songs by artists user is fan of
 app.get('/artist/favorite/newsongs', async(req,res,next)=>{
   try {
-    const username = req.user.username;
-    const results = await artistService.getNewSongsByFavoriteArtist(username)
+    const currentUser = req.user.username;
+    const results = await artistService.getNewSongsByFavoriteArtist(currentUser)
     res.json(results)
   } catch (error) {
+    console.error(e);
+    next(e);
+  }
+})
+
+// GET all friend requests
+app.get('/friend/requests', async(req,res,next)=>{
+  try {
+    const currentUser = req.user.username;
+    const results = await FriendService.getFriendRequests(currentUser)
+    res.json(results)
+  } catch (error) {
+    console.error(e);
+    next(e);
+  }
+})
+
+
+// GET recommended songs for current user
+app.get('/songs/recommended', async(req,res,next)=>{
+  try {
+    const currentUser = req.user.username;
+    const results = await SongsService.getRecommendedSongsForCurrentUser(currentUser)
+    res.json(results)
+  } catch (error) {
+    console.error(e);
+    next(e);
+  }
+})
+
+// GET all friends for specific
+app.get('/people/:username/friends', async (req,res, next) => {
+  try {
+  const {username} = req.params
+  const results = await PeopleService.getUserFriends(username)
+
+  res.json(results)
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+})
+
+// GET all follows for specific
+app.get('/people/:username/follows', async (req,res, next) => {
+  try {
+  const {username} = req.params
+  const results = await PeopleService.getUserFollows(username)
+
+  res.json(results)
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+})
+
+// GET all songs rated by specific
+app.get('/people/:username/songs/rated', async (req,res, next) => {
+  try {
+  const {username} = req.params
+  const results = await PeopleService.getRatedSongs(username)
+
+  res.json(results)
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+})
+
+// GET all songs reviewed by specific
+app.get('/people/:username/songs/reviewed', async (req,res, next) => {
+  try {
+  const {username} = req.params
+  const results = await PeopleService.getReviewedSongs(username)
+  res.json(results)
+  } catch (e) {
     console.error(e);
     next(e);
   }
