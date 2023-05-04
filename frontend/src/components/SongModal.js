@@ -107,7 +107,7 @@ export const SongModal = (props) => {
                         border: '2px solid cornflowerblue'
                     }}>
                         <h4>Song Reviews</h4>
-                        <p>{songReviews.map((res, idx) => {
+                        <p>{!isEmpty(songReviews) && songReviews.map((res, idx) => {
                         return (<tr key={idx}>
                             <td>{res.reviewText}</td>
                         </tr>)
