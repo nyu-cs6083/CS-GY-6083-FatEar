@@ -14,8 +14,8 @@ const insertRating = async (username, songID, stars) => {
       .join('');
     const insertResult = await db.getDBObject()
     .query(
-      "INSERT into ?? (username, songID, stars, ratingDate) values(?, ?, ?, ?)",
-      [db.RateSongTable, username, songID, stars, ratingDate]
+      "INSERT into ?? (username, songID, stars, ratingDate) values(?, ?, ?, ?) ON DUPLICATE KEY UPDATE stars=?, ratingDate=?",
+      [db.RateSongTable, username, songID, stars, ratingDate, stars, ratingDate]
       
     )
     console.log(insertResult)

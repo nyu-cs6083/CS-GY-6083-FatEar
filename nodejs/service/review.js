@@ -13,8 +13,8 @@ const insertReview = async (username, songID, reviewText) => {
       .join('');
     const insertResult = await db.getDBObject()
     .query(
-      "INSERT into ?? (username, songID, reviewText, reviewDate) values(?, ?, ?, ?)",
-      [db.ReviewSongTable, username, songID, reviewText, reviewDate]
+      "INSERT into ?? (username, songID, reviewText, reviewDate) values(?, ?, ?, ?) ON DUPLICATE KEY UPDATE reviewText=?, reviewDate=?",
+      [db.ReviewSongTable, username, songID, reviewText, reviewDate, reviewText, reviewDate]
       
     )
     console.log(insertResult)
