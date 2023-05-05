@@ -21,7 +21,7 @@ const getPeopleResults = async (firstName, lastName, email) => {
 
     console.log('SELECT * FROM users WHERE ' + filtersQueryString)
 
-   const peopleResults = await db.getDBObject().query('SELECT * FROM users WHERE '
+   const peopleResults = await db.getDBObject().query('SELECT fname, lname, email, userProfile FROM users WHERE '
         + filtersQueryString)
 
    console.log(peopleResults)
