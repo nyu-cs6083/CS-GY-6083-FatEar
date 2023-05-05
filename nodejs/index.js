@@ -5,6 +5,7 @@ const AuthService = require('./service/auth');
 const AuthMiddleWare = require('./middleware/auth');
 const RecipeService = require('./service/recipe');
 const RatingService = require('./service/rating'); // Added by Nigel
+const ReviewService = require('./service/review'); // Added by Nigel
 const SearchService = require('./service/search');
 const PeopleService = require('./service/people');
 const FollowService = require('./service/follow');
@@ -65,6 +66,38 @@ app.get('/search', async(req,res,next)=>{
 })
 
 
+// Added by Nigel
+// Need to create a get rating
+app.get('/rating/:songID', async (req,res, next) => {
+  try {
+    // console.log({req})
+  const {songID} = req.params
+  // console.log(req.headers)
+  const songRatings = await RatingService.getSongRatings(Number(songID))
+  //console.log(songRatings)
+  res.json(songRatings)
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+})
+
+// Added by Nigel
+// Need to create a get rating
+app.get('/review/:songID', async (req,res, next) => {
+  try {
+    // console.log({req})
+  const {songID} = req.params
+  // console.log(req.headers)
+  const songReviews = await ReviewService.getSongReview(Number(songID))
+  //console.log(songRatings)
+  res.json(songReviews)
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+})
+
 // all routes defined after this middleware requires auth token
 app.use(AuthMiddleWare.loginAuth);
 
@@ -79,6 +112,15 @@ app.get('/user', async (req,res, next) => {
     next(e);
   }
 })
+
+
+
+
+
+// Added by Nigel
+// Need to create a get review
+
+
 
 // Added by Nigel
 // Needs to be modified to post a rating
@@ -163,7 +205,7 @@ app.post('/friend/accept', async (req, res, next) => {
 
 // POST route to decline friend request
 app.post('/friend/decline', async (req, res, next) => {
-  
+
   const currentUser = req.user.username;
 
   try {
@@ -289,6 +331,24 @@ app.get('/people/:username/songs/reviewed', async (req,res, next) => {
     next(e);
   }
 })
+
+// Added by Nigel
+// Needs to be modified to post a review
+
+app.post('/review', async (req, res, next) => {
+  try {
+    const {
+      songReview,
+      songID
+    } = req.body;
+    const username = req.user.username;
+    const postedReview = await ReviewService.insertReview(username, songID, songReview);
+    res.json(postedReview);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
 
 app.use(errorHandler);
 
