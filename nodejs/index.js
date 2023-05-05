@@ -281,7 +281,7 @@ app.get('/songs/recommended', async(req,res,next)=>{
   }
 })
 
-// GET all friends for specific
+// GET all friends for specific user
 app.get('/people/:username/friends', async (req,res, next) => {
   try {
   const {username} = req.params
@@ -294,7 +294,7 @@ app.get('/people/:username/friends', async (req,res, next) => {
   }
 })
 
-// GET all follows for specific
+// GET all follows for specific user
 app.get('/people/:username/follows', async (req,res, next) => {
   try {
   const {username} = req.params
@@ -307,7 +307,20 @@ app.get('/people/:username/follows', async (req,res, next) => {
   }
 })
 
-// GET all songs rated by specific
+// GET all followers for specific user
+app.get('/people/:username/followers', async (req,res, next) => {
+  try {
+  const {username} = req.params
+  const results = await PeopleService.getUserFollowers(username)
+
+  res.json(results)
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+})
+
+// GET all songs rated by specific user
 app.get('/people/:username/songs/rated', async (req,res, next) => {
   try {
   const {username} = req.params
@@ -320,7 +333,7 @@ app.get('/people/:username/songs/rated', async (req,res, next) => {
   }
 })
 
-// GET all songs reviewed by specific
+// GET all songs reviewed by specific user
 app.get('/people/:username/songs/reviewed', async (req,res, next) => {
   try {
   const {username} = req.params
@@ -331,6 +344,31 @@ app.get('/people/:username/songs/reviewed', async (req,res, next) => {
     next(e);
   }
 })
+
+// GET profile of specific user
+app.get('/people/:username/profile', async (req,res, next) => {
+  try {
+  const {username} = req.params
+  const results = await PeopleService.getProfile(username)
+  res.json(results)
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+})
+
+// GET favorite songs of specific user
+app.get('/people/:username/favorite/songs', async (req,res, next) => {
+  try {
+  const {username} = req.params
+  const results = await PeopleService.getFavoriteSongs(username)
+  res.json(results)
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+})
+
 
 // Added by Nigel
 // Needs to be modified to post a review

@@ -67,8 +67,7 @@ const getUserFriends = async (username) => {
 //  Get list of follows for specified username 
 const getUserFollows = async (username) => {
   try {
-    const results =  await db.getDBObject().query(`SELECT fname, lname, email FROM users `+
-                                                  `WHERE users.username IN (SELECT followed FROM follows WHERE follower = "${username}");`)
+    const results =  await db.getDBObject().query(`SELECT  fname, lname, email FROM users JOIN follows ON users.username = follows.followed WHERE follows.follower = '${username}';`)
     
     console.log(results)
     
@@ -78,6 +77,29 @@ const getUserFollows = async (username) => {
 
     console.error(e)
     console.error('Unable to get all friends for current user')
+
+    if (!(e instanceof ExtendableError)) {
+      console.error(e);
+      throw new InternalServerError();
+    }
+    
+    throw e;
+  }
+};
+
+//  Get list of followers for specified username 
+const getUserFollowers = async (username) => {
+  try {
+    const results =  await db.getDBObject().query(`SELECT  fname, lname, email FROM users JOIN follows ON users.username = follows.follower WHERE follows.followed = '${username}';`)
+    
+    console.log(results)
+    
+    return results;
+
+  } catch (e) {
+
+    console.error(e)
+    console.error('Unable to get all follower of current user')
 
     if (!(e instanceof ExtendableError)) {
       console.error(e);
@@ -138,6 +160,58 @@ const getRatedSongs = async (username) => {
   }
 };
 
+//  Get user profile by username
+const getProfile = async (username) => {
+  try {
+    const results =  await db.getDBObject().query(`SELECT username, fname, lname, numFriends, COUNT(follows.followed) as numFollowers 
+                                                   FROM (SELECT username, fname, lname, COUNT(friend.user2) as numFriends FROM users JOIN friend ON users.username = friend.user1 WHERE users.username = "${username}" AND friend.acceptStatus = 'Accepted' GROUP BY users.username) AS numFriendsTableByUser
+                                                   JOIN follows ON numFriendsTableByUser.username = follows.followed GROUP BY username;`
+    )
+    
+    console.log(results)
+    
+    return results;
+
+  } catch (e) {
+
+    console.error(e)
+    console.error('Unable to get profile')
+
+    if (!(e instanceof ExtendableError)) {
+      console.error(e);
+      throw new InternalServerError();
+    }
+    
+    throw e;
+  }
+};
+
+//  Get favorite songs by username
+const getFavoriteSongs = async (username) => {
+  try {
+    const results =  await db.getDBObject().query(`SELECT song.title, song.releaseDate, song.songURL, rateSong.stars, artist.fname as artistFname, artist.lname as artistlname
+                                                   FROM users NATURAL JOIN userFanOfArtist JOIN artist ON artist.artistID = userFanOfArtist.artistID
+                                                   JOIN artistPerformsSong ON artistPerformsSong.artistID = userFanOfArtist.artistID NATURAL JOIN song NATURAL JOIN rateSong WHERE users.username = "${username}" AND rateSong.stars >=4 AND rateSong.username = "${username}";`
+     )
+    
+    console.log(results)
+    
+    return results;
+
+  } catch (e) {
+
+    console.error(e)
+    console.error('Unable to get profile')
+
+    if (!(e instanceof ExtendableError)) {
+      console.error(e);
+      throw new InternalServerError();
+    }
+    
+    throw e;
+  }
+};
+
 module.exports = {
-  getPeopleResults, getUserFriends, getUserFollows, getReviewedSongs, getRatedSongs
+  getPeopleResults, getUserFriends, getUserFollows, getUserFollowers, getReviewedSongs, getRatedSongs, getProfile, getFavoriteSongs
 }

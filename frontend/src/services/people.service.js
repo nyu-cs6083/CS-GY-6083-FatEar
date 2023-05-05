@@ -23,6 +23,29 @@ const getUserFollows = async (username) => {
   return data;
 }
 
+// Get all followers of specific user
+const getUserFollowers = async (username) => {
+  const {data} = await axios.get(`${API_URL}people/${username}/followers`,{ headers: authHeader() })
+  console.log(data)
+  return data;
+}
+
+// Get specific user profile
+const getProfile = async (username) => {
+  const {data} = await axios.get(`${API_URL}people/${username}/profile`,{ headers: authHeader() })
+  console.log(data)
+  return data;
+}
+
+
+// Get favorite songs of current user
+const getFavoriteSongs = async (username) => {
+  const {data} = await axios.get(`${API_URL}people/${username}/favorite/songs`,{ headers: authHeader() })
+  console.log(data)
+  return data;
+}
+
+
 // Get all songs rated by specific user
 const getRatedSongs = async (username) => {
   const {data} = await axios.get(`${API_URL}people/${username}/songs/rated`,{ headers: authHeader() })
@@ -38,7 +61,7 @@ const getReviewedSongs = async (username) => {
 }
 
 const PeopleService = {
-  getPeopleResults, getUserFriends, getUserFollows, getRatedSongs, getReviewedSongs
+  getPeopleResults, getUserFriends, getUserFollows, getUserFollowers, getRatedSongs, getReviewedSongs, getProfile, getFavoriteSongs
 }
 
 export default PeopleService; 
