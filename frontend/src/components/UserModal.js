@@ -2,12 +2,28 @@ import RatingService from "../services/rating.service";
 import {useEffect, useState} from "react";
 import FriendService from "../services/friend.service";
 import FollowService from "../services/follow.service";
+import PeopleService from "../services/people.service";
+import {isEmpty} from "lodash";
 
 export const UserModal = (props) => {
     const {setShowUserModal, user} = props
-    // useEffect(async()=>{
-    //
-    // },[])
+
+    const [userProfile, setUserProfile] = useState(undefined)
+    const [favoriteSongs, setFavoriteSongs] = useState([])
+    const [userFollows, setUserFollows] = useState(0)
+
+    useEffect(async()=>{
+        const userProfileWithFriends = await PeopleService.getProfile(user.username)
+         if (!userProfileWithFriends){
+             setUserProfile(user)
+         }else{
+             setUserProfile(userProfileWithFriends)
+         }
+         setFavoriteSongs(await PeopleService.getFavoriteSongs(user.username))
+        const userFollows = await PeopleService.getUserFollows(user.username)
+        setUserFollows(userFollows.length)
+    },[])
+
     return (
         <div style={{
             left: 0,
@@ -27,11 +43,11 @@ export const UserModal = (props) => {
                 marginTop: '8%',
                 marginLeft: '10%',
                 backgroundColor: 'cornflowerblue',
-                height: '80%',
+                height: '50%',
                 width: '80%',
                 padding: '20px'
             }}>
-                <div style={{display: 'flex', height: '90%', marginBottom: '1rem'}}>
+                <div style={{display: 'flex', height: '80%', marginBottom: '1rem'}}>
                     <div style={{
                         display: 'flex',
                         width: '50%',
@@ -41,8 +57,19 @@ export const UserModal = (props) => {
                         padding: '1rem'
                     }}>
                         <h4>User Details</h4>
-                        <span>Name: {user.fname + ' ' + user.lname}</span>
-                        <span>Profile: {user.userProfile}</span>
+                        {userProfile && <div style={{display: 'flex', flexDirection: 'column'}}>
+                            <span>Name: {userProfile.fname + ' ' + userProfile.lname}</span>
+                            <span>Profile: {userProfile.userProfile}</span>
+                            <span>
+                                {userProfile.numFriends ?? 0} Friends
+                            </span>
+                            <span>
+                                {userProfile.numFollowers ?? 0} Followers
+                            </span>
+                            <span>
+                                {userFollows} Following
+                            </span>
+                        </div>}
                         <div style={{marginTop: '8px'}}>
                             <button onClick={async()=>{
                                 try{
@@ -54,7 +81,7 @@ export const UserModal = (props) => {
 
                             }}>Friend</button>
                             <button onClick={async()=>{ try{
-                                const res = await FollowService.postFollow({username: user.username})
+                                await FollowService.postFollow({username: user.username})
                                 alert('Followed')
                             }catch (e) {
                                 alert(e.response.data.error.info)
@@ -70,20 +97,10 @@ export const UserModal = (props) => {
                         border: '2px solid cornflowerblue',
                         padding: '1rem'
                     }}>
-                        <h4>User Details</h4>
-                        {/*<span>Title: {song.title}</span>*/}
-                        {/*<span>Artist Name: {song.fname + ' ' + song.lname}</span>*/}
-                        {/*<span>Release Date: {song.releaseDate.slice(0,10)}</span>*/}
-                        {/*<span>Song URL: <a href={song.songURL}>Listen</a></span>*/}
-                        {/*<span>Artist URL: <a href={song.artistURL}>Learn More</a></span>*/}
-                        {/*Need to get song rating for this song*/}
-
-                        {/*Nigel: frontend trigger for rating a song and reviewing a song*/}
-                        {/* treat the rate button as a front end trigger and add an input box next to it that*/}
-                        {/* the rate button sends the value from to the backend.*/}
-                        <div>
-                            <button onClick={()=>{}}>Friend</button>
-                        </div>
+                        <h4>Favorite Songs</h4>
+                        {!isEmpty(favoriteSongs) ? favoriteSongs.map((song)=>{
+                            return <span>{song.title} by {song.artistFname} {song.artistlname}</span>
+                        }): <span>This user does not have favorite songs yet</span>}
 
                     </div>
 

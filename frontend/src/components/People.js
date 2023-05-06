@@ -22,10 +22,6 @@ const People = () => {
 
     }
 
-    const handleFollow = async (follower, follows) => {
-        await FollowService.postFollow({follower, follows})
-    }
-
 
     const handleSubmit = async (values) => {
         setHasSubmitted(true)

@@ -4,12 +4,16 @@ import {Navigate} from "react-router-dom";
 import FriendService from "../services/friend.service";
 import FollowService from "../services/follow.service";
 import ArtistService from "../services/artist.service";
+import PeopleService from "../services/people.service";
+import SongsService from "../services/songs.service";
+import {isEmpty} from "lodash";
 
 const Home = () => {
     const currentUser = AuthService.getCurrentUser();
     const [friendReviews, setFriendReviews] = useState([])
     const [followsReviews, setFollowsReviews] = useState([])
     const [newSongs, setNewSongs] = useState([])
+    const [recommendedSongs, setRecommendedSongs] = useState([])
 
     useEffect(async()=>{
 
@@ -22,6 +26,12 @@ const Home = () => {
         const newSongsByFavoriteArtist = await ArtistService.getNewSongs()
         setNewSongs(newSongsByFavoriteArtist)
 
+        await PeopleService.getProfile(currentUser.username)
+
+        const recommendedSongs = await SongsService.getRecommendedSongsForCurrentUser()
+        console.log(recommendedSongs)
+        setRecommendedSongs(recommendedSongs)
+
     },[])
 
 
@@ -29,11 +39,7 @@ const Home = () => {
         return <Navigate to="/login" replace={true} />;
     }
 
-    console.log(followsReviews)
-    if (!currentUser) {
-        return <Navigate to="/login" replace={true} />;
-    }
-
+    const userProfile = PeopleService.getCurrentUserProfile()
 return (<div style={{display: 'flex', justifyContent: 'space-between', width: '100%', height: '100vh', backgroundColor: 'cornflowerblue'}}>
     <div style={{padding: '8px', height: '100vh', width: '30%', border: '2px solid cornflowerblue', backgroundColor: 'snow'}}>
         <header style={{marginBottom: '1rem'}}>
@@ -42,19 +48,25 @@ return (<div style={{display: 'flex', justifyContent: 'space-between', width: '1
             </h3>
         </header>
         <p>
-            <strong>Username: </strong> {currentUser.username}
+            <strong>Username: </strong> {userProfile.username}
         </p>
         <p>
-            <strong>First Name: </strong> {currentUser.fname}
+            <strong>First Name: </strong> {userProfile.fname}
         </p>
         <p>
-            <strong>Last Name: </strong> {currentUser.lname}
+            <strong>Last Name: </strong> {userProfile.lname}
         </p>
         <p>
-            <strong>Email: </strong> {currentUser.email}
+            <strong>Email: </strong> {userProfile.email}
         </p>
         <p>
-            <strong>Profile: </strong> {currentUser.userProfile}
+            <strong>Profile: </strong> {userProfile.userProfile}
+        </p>
+        <p>
+            {userProfile.numFriends} Friends
+        </p>
+        <p>
+            {userProfile.numFollowers} Followers
         </p>
     </div>
     <div style={{padding: '8px', height: '100vh', width: '30%', border: '2px solid cornflowerblue', backgroundColor: 'azure'}}>
@@ -80,10 +92,11 @@ return (<div style={{display: 'flex', justifyContent: 'space-between', width: '1
             <div id={'followers'}>
                 <h5>Followers News</h5>
                 {followsReviews.length ? followsReviews.map((reviewsByFollows)=>{
+                    // console.log(reviewsByFollows)
                     return(
                         <div style={{ border: '1px solid', marginTop: '16px'}}>
                             <p style={{color: 'blueviolet'}}>{reviewsByFollows.fname + ' ' + reviewsByFollows.lname + ' has' +
-                                ' reviewed ' + reviewsByFollows.title + '!'}</p>
+                                ' reviewed ' + reviewsByFollows.title + ' by ' + reviewsByFollows.artistFname + ' ' + reviewsByFollows.artistLname + '!'}</p>
                             <p>{'Review Text: ' + reviewsByFollows.reviewText}</p>
                             <p>{'Review Date: ' + reviewsByFollows.reviewDate.slice(0,10)}</p>
                         </div>
@@ -102,10 +115,20 @@ return (<div style={{display: 'flex', justifyContent: 'space-between', width: '1
                     return(
                         <div style={{display: 'flex'}}>
                             <p>{title + ' was released on ' + releaseDate.slice(0,10) + ' by ' + fname + ' ' + lname + '!'}</p>
-                            <a style={{marginTop: '8px', marginLeft: '16px', border: '1px solid', height: '24px', color: 'yellow'}} href={`${songURL}`}>Listen Here</a>
+                            <a style={{marginTop: '8px', marginLeft: '16px', border: '1px solid', height: 'fit-content', color: 'yellow'}} href={`${songURL}`}>Listen Here</a>
                         </div>
                     )
                 }): <p>There are no new songs released since you last logged in.</p>}
+            <h3 style={{marginTop: '16px'}}>
+               Songs You Might Like...
+            </h3>
+            {!isEmpty(recommendedSongs) ? recommendedSongs.map((song)=>{
+                const {fname, lname, title, releaseDate, songURL} = song
+                return ( <div style={{display: 'flex'}}>
+                    <p>{title + ' was released on ' + releaseDate.slice(0,10) + ' by ' + fname + ' ' + lname + '!'}</p>
+                    <a style={{marginTop: '8px', marginLeft: '16px', border: '1px solid', height: 'fit-content', color: 'yellow'}} href={`${songURL}`}>Listen Here</a>
+                </div>)
+            }) : <span>Unable to make recommendations as you are a new user</span>}
         </header>
     </div>
 </div>)
