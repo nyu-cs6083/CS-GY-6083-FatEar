@@ -86,11 +86,8 @@ app.get('/rating/:songID', async (req,res, next) => {
 // Need to create a get rating
 app.get('/review/:songID', async (req,res, next) => {
   try {
-    // console.log({req})
   const {songID} = req.params
-  // console.log(req.headers)
   const songReviews = await ReviewService.getSongReview(Number(songID))
-  //console.log(songRatings)
   res.json(songReviews)
   } catch (e) {
     console.error(e);

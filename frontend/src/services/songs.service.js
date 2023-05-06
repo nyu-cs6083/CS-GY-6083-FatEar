@@ -9,6 +9,6 @@ const getRecommendedSongsForCurrentUser = async () => {
   return data;
 }
 
-const ArtistService = {getRecommendedSongsForCurrentUser}
+const SongsService = {getRecommendedSongsForCurrentUser}
 
-export default ArtistService;
+export default SongsService;

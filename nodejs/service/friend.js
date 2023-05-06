@@ -1,20 +1,25 @@
 const db = require('../db/main');
 const InternalServerError = require('../errors/internalServerError');
+const {ExtendableError} = require("../errors/main");
+const FriendRequestSent = require("../errors/friendRequestSent");
 const timestamp = (new Date()).toISOString();
 
 // Usecase 6b -  Function to send friend request
 const inviteFriend = async (user1, user2) => {
   try {
 
-    await db.getDBObject() .query(
-      "INSERT into ?? (user1, user2, acceptStatus, requestSentBy, createdAt, updatedAt) values(?, ?, ?,?,?,?)",
-      [db.FriendTable, user1, user2, 'Pending', user1, timestamp, timestamp]
-  )
+    return await db.getDBObject().query(
+        "INSERT into ?? (user1, user2, acceptStatus, requestSentBy, createdAt, updatedAt) values(?, ?, ?,?,?,?)",
+        [db.FriendTable, user1, user2, 'Pending', user1, timestamp, timestamp]
+    )
 
   } catch (e) {
 
     console.error(e)
     console.error('Unable to friend user')
+    if (e.code && e.code === 'ER_DUP_ENTRY'){
+      throw new FriendRequestSent()
+    }
 
     if (!(e instanceof ExtendableError)) {
       console.error(e);

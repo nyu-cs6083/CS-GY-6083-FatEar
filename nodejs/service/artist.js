@@ -6,17 +6,17 @@ const InternalServerError = require('../errors/internalServerError');
 const getNewSongsByFavoriteArtist = async (user) => {
 
   try {
-    const newSongs =  await db.getDBObject() .query(`SELECT * FROM song s JOIN artistPerformsSong a ON s.songID = a.songID WHERE a.artistID IN (SELECT artistID FROM userFanOfArtist WHERE username = "${user}") AND s.releaseDate >= (SELECT lastlogin FROM  users WHERE username = "${user}");`);
-    
-    console.log(newSongs)
-    
-    return newSongs;
-    
+    return await db.getDBObject().query(`SELECT *
+                                         FROM song s
+                                                NATURAL JOIN artistPerformsSong a
+                                                NATURAL JOIN artist
+                                         WHERE a.artistID IN (SELECT artistID
+                                                              FROM userFanOfArtist
+                                                              WHERE username = "${user}")
+                                           AND s.releaseDate >= (SELECT lastlogin FROM users WHERE username = "${user}");`);
   } catch (e) {
-
     console.error(e)
     console.error('Unable to get new songs by artist whom user is a fan of')
-
     if (!(e instanceof ExtendableError)) {
       console.error(e);
       throw new InternalServerError();

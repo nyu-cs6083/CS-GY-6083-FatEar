@@ -121,7 +121,7 @@ const registerUser = async (
 const JWTConfig = {
   issuer: 'fatear',
   audience: 'fatear',
-  expiresIn: '2d',
+  expiresIn: '7d',
 };
 
 const generateToken = (userName) =>

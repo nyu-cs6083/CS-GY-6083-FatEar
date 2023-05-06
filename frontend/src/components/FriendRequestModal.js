@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faClose} from "@fortawesome/free-solid-svg-icons";
 import FriendService from "../services/friend.service";
+import {isEmpty} from "lodash";
 
 
 const FriendRequestModal = (props) => {
@@ -37,7 +38,7 @@ const FriendRequestModal = (props) => {
     <button onClick={()=>setShowFriendRequestModal(false)}><FontAwesomeIcon icon={faClose} /></button>
 </div>
 <div id={'FriendRequests'}>
-            {friendRequests && friendRequests.map((listOfFriendRequests)=>{
+            {!isEmpty(friendRequests) ? friendRequests.map((listOfFriendRequests)=>{
                     return(
                         <div>
                             <p>Name: {listOfFriendRequests.fname} {listOfFriendRequests.lname}</p>
@@ -47,7 +48,7 @@ const FriendRequestModal = (props) => {
                             <button onClick={()=>handleDeclineFriend(listOfFriendRequests.username)}>Decline</button>
                         </div>
                     )
-                })}
+                }): <span>You have no new friend requests</span>}
     </div>
     </div>
 }

@@ -4,12 +4,16 @@ import {Navigate} from "react-router-dom";
 import FriendService from "../services/friend.service";
 import FollowService from "../services/follow.service";
 import ArtistService from "../services/artist.service";
+import PeopleService from "../services/people.service";
+import SongsService from "../services/songs.service";
+import {isEmpty} from "lodash";
 
 const Home = () => {
     const currentUser = AuthService.getCurrentUser();
     const [friendReviews, setFriendReviews] = useState([])
     const [followsReviews, setFollowsReviews] = useState([])
     const [newSongs, setNewSongs] = useState([])
+    const [recommendedSongs, setRecommendedSongs] = useState([])
 
     useEffect(async()=>{
 
@@ -22,19 +26,20 @@ const Home = () => {
         const newSongsByFavoriteArtist = await ArtistService.getNewSongs()
         setNewSongs(newSongsByFavoriteArtist)
 
+        await PeopleService.getProfile(currentUser.username)
+
+        const recommendedSongs = await SongsService.getRecommendedSongsForCurrentUser()
+        console.log(recommendedSongs)
+        setRecommendedSongs(recommendedSongs)
+
     },[])
 
 
-console.log(friendReviews)
     if (!currentUser) {
         return <Navigate to="/login" replace={true} />;
     }
 
-    console.log(followsReviews)
-    if (!currentUser) {
-        return <Navigate to="/login" replace={true} />;
-    }
-
+    const userProfile = PeopleService.getCurrentUserProfile()
 return (<div style={{display: 'flex', justifyContent: 'space-between', width: '100%', height: '100vh', backgroundColor: 'cornflowerblue'}}>
     <div style={{padding: '8px', height: '100vh', width: '30%', border: '2px solid cornflowerblue', backgroundColor: 'snow'}}>
         <header style={{marginBottom: '1rem'}}>
@@ -43,19 +48,25 @@ return (<div style={{display: 'flex', justifyContent: 'space-between', width: '1
             </h3>
         </header>
         <p>
-            <strong>Username: </strong> {currentUser.username}
+            <strong>Username: </strong> {userProfile.username}
         </p>
         <p>
-            <strong>First Name: </strong> {currentUser.fname}
+            <strong>First Name: </strong> {userProfile.fname}
         </p>
         <p>
-            <strong>Last Name: </strong> {currentUser.lname}
+            <strong>Last Name: </strong> {userProfile.lname}
         </p>
         <p>
-            <strong>Email: </strong> {currentUser.email}
+            <strong>Email: </strong> {userProfile.email}
         </p>
         <p>
-            <strong>Profile: </strong> {currentUser.userProfile}
+            <strong>Profile: </strong> {userProfile.userProfile}
+        </p>
+        <p>
+            {userProfile.numFriends} Friends
+        </p>
+        <p>
+            {userProfile.numFollowers} Followers
         </p>
     </div>
     <div style={{padding: '8px', height: '100vh', width: '30%', border: '2px solid cornflowerblue', backgroundColor: 'azure'}}>
@@ -65,29 +76,32 @@ return (<div style={{display: 'flex', justifyContent: 'space-between', width: '1
             </h3>
             <div id={'friends'} style={{height: 'fit-content'}}>
                 <h5>Friends News</h5>
-                {friendReviews && friendReviews.map((reviewsByFriend)=>{
+                {friendReviews.length ? friendReviews.map((reviewsByFriend)=>{
+                    console.log(reviewsByFriend)
                     return(
                         <div>
+                            <p>{reviewsByFriend.fname + ' ' + reviewsByFriend.lname + ' has reviewed ' + reviewsByFriend.title}</p>
                             <p>{reviewsByFriend.reviewText}</p>
                             <p>{reviewsByFriend.title}</p>
                             <p>{reviewsByFriend.username}</p>
                             <p>{reviewsByFriend.reviewDate.slice(0,10)}</p>
                         </div>
                     )
-                })}
+                }): <p>You have no new Friends News</p>}
             </div>
             <div id={'followers'}>
                 <h5>Followers News</h5>
-                {followsReviews && followsReviews.map((reviewsByFollows)=>{
+                {followsReviews.length ? followsReviews.map((reviewsByFollows)=>{
+                    // console.log(reviewsByFollows)
                     return(
-                        <div>
-                            <p>{reviewsByFollows.reviewText}</p>
-                            <p>{reviewsByFollows.title}</p>
-                            <p>{reviewsByFollows.username}</p>
-                            <p>{reviewsByFollows.reviewDate.slice(0,10)}</p>
+                        <div style={{ border: '1px solid', marginTop: '16px'}}>
+                            <p style={{color: 'blueviolet'}}>{reviewsByFollows.fname + ' ' + reviewsByFollows.lname + ' has' +
+                                ' reviewed ' + reviewsByFollows.title + ' by ' + reviewsByFollows.artistFname + ' ' + reviewsByFollows.artistLname + '!'}</p>
+                            <p>{'Review Text: ' + reviewsByFollows.reviewText}</p>
+                            <p>{'Review Date: ' + reviewsByFollows.reviewDate.slice(0,10)}</p>
                         </div>
                     )
-                })}
+                }) : <p>You have no new Followers News</p>}
             </div>
         </header>
     </div>
@@ -96,15 +110,25 @@ return (<div style={{display: 'flex', justifyContent: 'space-between', width: '1
             <h3>
                 New Songs
             </h3>
-            {newSongs && newSongs.map((newSongsByFavoriteArtist)=>{
+            {newSongs ? newSongs.map((newSongsByFavoriteArtist)=>{
+                const {fname, lname, title, releaseDate, songURL} = newSongsByFavoriteArtist
                     return(
-                        <div>
-                            <p>{newSongsByFavoriteArtist.title}</p>
-                            <p>{newSongsByFavoriteArtist.releaseDate}</p>
-                            <p>{newSongsByFavoriteArtist.songURL}</p>
+                        <div style={{display: 'flex'}}>
+                            <p>{title + ' was released on ' + releaseDate.slice(0,10) + ' by ' + fname + ' ' + lname + '!'}</p>
+                            <a style={{marginTop: '8px', marginLeft: '16px', border: '1px solid', height: 'fit-content', color: 'yellow'}} href={`${songURL}`}>Listen Here</a>
                         </div>
                     )
-                })}
+                }): <p>There are no new songs released since you last logged in.</p>}
+            <h3 style={{marginTop: '16px'}}>
+               Songs You Might Like...
+            </h3>
+            {!isEmpty(recommendedSongs) ? recommendedSongs.map((song)=>{
+                const {fname, lname, title, releaseDate, songURL} = song
+                return ( <div style={{display: 'flex'}}>
+                    <p>{title + ' was released on ' + releaseDate.slice(0,10) + ' by ' + fname + ' ' + lname + '!'}</p>
+                    <a style={{marginTop: '8px', marginLeft: '16px', border: '1px solid', height: 'fit-content', color: 'yellow'}} href={`${songURL}`}>Listen Here</a>
+                </div>)
+            }) : <span>Unable to make recommendations as you are a new user</span>}
         </header>
     </div>
 </div>)
