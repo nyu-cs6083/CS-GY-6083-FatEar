@@ -46,8 +46,6 @@ const getUserFriends = async (username) => {
     const results =  await db.getDBObject().query(`SELECT fname, lname, email FROM users `+
                                                   `WHERE users.username IN (SELECT user2 FROM friend WHERE acceptStatus = "Accepted" AND user1 = "${username}" UNION SELECT  user1 FROM friend WHERE acceptStatus = "Accepted" AND user2 = "${username}");`)
     
-    console.log(results)
-    
     return results;
 
   } catch (e) {
@@ -68,8 +66,6 @@ const getUserFriends = async (username) => {
 const getUserFollows = async (username) => {
   try {
     const results =  await db.getDBObject().query(`SELECT  fname, lname, email FROM users JOIN follows ON users.username = follows.followed WHERE follows.follower = '${username}';`)
-    
-    console.log(results)
     
     return results;
 
@@ -115,9 +111,8 @@ const getReviewedSongs = async (username) => {
   try {
     const results =  await db.getDBObject().query(`SELECT * FROM reviewSong `+
                                                   `NATURAL JOIN song `+
+                                                  `NATURAL JOIN user` +
                                                   `WHERE username = "${username}";`)
-    
-    console.log(results)
     
     return results;
 

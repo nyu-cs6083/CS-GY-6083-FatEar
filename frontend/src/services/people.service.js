@@ -12,14 +12,12 @@ const getPeopleResults = async ({firstName, lastName, email}) => {
 // Get all friends of specific user
 const getUserFriends = async (username) => {
   const {data} = await axios.get(`${API_URL}people/${username}/friends`,{ headers: authHeader() })
-  console.log(data)
   return data;
 }
 
 // Get all follows of specific user
 const getUserFollows = async (username) => {
   const {data} = await axios.get(`${API_URL}people/${username}/follows`,{ headers: authHeader() })
-  console.log(data)
   return data;
 }
 
@@ -49,14 +47,12 @@ const getFavoriteSongs = async (username) => {
 // Get all songs rated by specific user
 const getRatedSongs = async (username) => {
   const {data} = await axios.get(`${API_URL}people/${username}/songs/rated`,{ headers: authHeader() })
-  console.log(data)
   return data;
 }
 
 // Get all songs reviewed by specific user
 const getReviewedSongs = async (username) => {
   const {data} = await axios.get(`${API_URL}people/${username}/songs/reviewed`,{ headers: authHeader() })
-  console.log(data)
   return data;
 }
 
