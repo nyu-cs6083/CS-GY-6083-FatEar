@@ -18,7 +18,7 @@ const insertRating = async (username, songID, stars) => {
       [db.RateSongTable, username, songID, stars, ratingDate, stars, ratingDate]
       
     )
-    console.log(insertResult)
+
     return {
       ratingID: insertResult.insertId,
       username,

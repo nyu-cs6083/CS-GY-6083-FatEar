@@ -1,6 +1,8 @@
 import axios from "axios";
 import authHeader from "./auth-header";
 import {API_URL} from "../constants";
+import AuthService from "./auth.service";
+
 
 // Search for users based on certain criteria
 const getPeopleResults = async ({firstName, lastName, email}) => {
@@ -23,15 +25,13 @@ const getUserFollows = async (username) => {
 // Get all followers of specific user
 const getUserFollowers = async (username) => {
   const {data} = await axios.get(`${API_URL}people/${username}/followers`,{ headers: authHeader() })
-  console.log(data)
   return data;
 }
 
 // Get specific user profile
 const getProfile = async (username) => {
   const {data} = await axios.get(`${API_URL}people/${username}/profile`,{ headers: authHeader() })
-  console.log(data)
-  if (data){
+  if (data && data.length){
     localStorage.setItem('userProfile', JSON.stringify(data[0]))
   }
   return data[0];
@@ -58,7 +58,13 @@ const getReviewedSongs = async (username) => {
 }
 
 const getCurrentUserProfile = () => {
-  return JSON.parse(localStorage.getItem('userProfile'))
+  const userProfile = localStorage.getItem('userProfile')
+  console.log(userProfile)
+  if (userProfile === 'undefined' || !userProfile){
+    return AuthService.getCurrentUser()
+  }else{
+    return JSON.parse(localStorage.getItem('userProfile'))
+  }
 }
 
 const PeopleService = {

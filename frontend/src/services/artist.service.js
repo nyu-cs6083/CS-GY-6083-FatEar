@@ -5,7 +5,6 @@ import {API_URL} from "../constants";
 // For getting all new songs of user's favorite artists
 const getNewSongs = async () => {
   const {data} = await axios.get(`${API_URL}artist/favorite/newsongs`,{ headers: authHeader() })
-  console.log(data)
   return data;
 }
 

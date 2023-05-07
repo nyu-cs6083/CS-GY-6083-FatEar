@@ -30,6 +30,8 @@ export const SongModal = (props) => {
 
     const handleSubmitSongRating = async () => {
         await RatingService.postRating(newSongRating, song.songID)
+        const ratings = await RatingService.getRating(song.songID)
+        setSongRatings(ratings[0])
     }
 
     const handleSubmitSongReview = async () => {

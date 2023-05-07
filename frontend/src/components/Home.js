@@ -29,7 +29,6 @@ const Home = () => {
         await PeopleService.getProfile(currentUser.username)
 
         const recommendedSongs = await SongsService.getRecommendedSongsForCurrentUser()
-        console.log(recommendedSongs)
         setRecommendedSongs(recommendedSongs)
 
     },[])
@@ -63,10 +62,10 @@ return (<div style={{display: 'flex', justifyContent: 'space-between', width: '1
             <strong>Profile: </strong> {userProfile.userProfile}
         </p>
         <p>
-            {userProfile.numFriends} Friends
+            {userProfile.numFriends ?? 0} Friends
         </p>
         <p>
-            {userProfile.numFollowers} Followers
+            {userProfile.numFollowers ?? 0} Followers
         </p>
     </div>
     <div style={{padding: '8px', height: '100vh', width: '30%', border: '2px solid cornflowerblue', backgroundColor: 'azure'}}>
@@ -74,27 +73,24 @@ return (<div style={{display: 'flex', justifyContent: 'space-between', width: '1
             <h3>
                 Newsfeed
             </h3>
-            <div id={'friends'} style={{height: 'fit-content'}}>
-                <h5>Friends News</h5>
+            <div id={'friends'} style={{height: 'fit-content', marginBottom: '16px'}}>
+                <h5 style={{color: 'mediumblue'}}>Friends News</h5>
                 {friendReviews.length ? friendReviews.map((reviewsByFriend)=>{
-                    console.log(reviewsByFriend)
                     return(
-                        <div>
-                            <p>{reviewsByFriend.fname + ' ' + reviewsByFriend.lname + ' has reviewed ' + reviewsByFriend.title}</p>
-                            <p>{reviewsByFriend.reviewText}</p>
-                            <p>{reviewsByFriend.title}</p>
-                            <p>{reviewsByFriend.username}</p>
-                            <p>{reviewsByFriend.reviewDate.slice(0,10)}</p>
+                        <div style={{ border: '1px solid', marginTop: '16px', backgroundColor: 'lavenderblush'}}>
+                            <p style={{color: 'blueviolet'}}>{reviewsByFriend.fname + ' ' + reviewsByFriend.lname + ' has' +
+                                ' reviewed ' + reviewsByFriend.title + ' by ' + reviewsByFriend.artistFname + ' ' + reviewsByFriend.artistLname + '!'}</p>
+                            <p>{'Review Text: ' + reviewsByFriend.reviewText}</p>
+                            <p>{'Review Date: ' + reviewsByFriend.reviewDate.slice(0,10)}</p>
                         </div>
                     )
                 }): <p>You have no new Friends News</p>}
             </div>
             <div id={'followers'}>
-                <h5>Followers News</h5>
+                <h5 style={{color: 'mediumblue'}}>Followers News</h5>
                 {followsReviews.length ? followsReviews.map((reviewsByFollows)=>{
-                    // console.log(reviewsByFollows)
                     return(
-                        <div style={{ border: '1px solid', marginTop: '16px'}}>
+                        <div style={{ border: '1px solid', marginTop: '16px', backgroundColor: 'lavender'}}>
                             <p style={{color: 'blueviolet'}}>{reviewsByFollows.fname + ' ' + reviewsByFollows.lname + ' has' +
                                 ' reviewed ' + reviewsByFollows.title + ' by ' + reviewsByFollows.artistFname + ' ' + reviewsByFollows.artistLname + '!'}</p>
                             <p>{'Review Text: ' + reviewsByFollows.reviewText}</p>
@@ -110,7 +106,7 @@ return (<div style={{display: 'flex', justifyContent: 'space-between', width: '1
             <h3>
                 New Songs
             </h3>
-            {newSongs ? newSongs.map((newSongsByFavoriteArtist)=>{
+            {!isEmpty(newSongs) ? newSongs.map((newSongsByFavoriteArtist)=>{
                 const {fname, lname, title, releaseDate, songURL} = newSongsByFavoriteArtist
                     return(
                         <div style={{display: 'flex'}}>

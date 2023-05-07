@@ -17,7 +17,6 @@ const insertReview = async (username, songID, reviewText) => {
       [db.ReviewSongTable, username, songID, reviewText, reviewDate, reviewText, reviewDate]
       
     )
-    console.log(insertResult)
     return {
       reviewID: insertResult.insertId,
       username,
@@ -41,7 +40,7 @@ const getSongReview = async (song) => {
         'SELECT fname, lname, reviewText, reviewDate FROM ?? NATURAL JOIN ?? WHERE songID = ?',
         [db.ReviewSongTable, db.UserTable, song]
       );
-    if (review.length == 0) {
+    if (review.length === 0) {
       throw new Error('Song reviews not found');
     }
     console.log(review)

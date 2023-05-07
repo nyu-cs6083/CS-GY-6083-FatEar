@@ -15,15 +15,21 @@ import Home from "./components/Home";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser} from "@fortawesome/free-solid-svg-icons";
 import FriendRequestModal from "./components/FriendRequestModal";
+import FriendService from "./services/friend.service";
+import {isEmpty} from "lodash";
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState(undefined);
   const [showFriendRequestModal, setShowFriendRequestModal] = useState(false)
-  useEffect(() => {
+  useEffect(async() => {
     const user = AuthService.getCurrentUser();
 
     if (user) {
       setCurrentUser(user);
+      const listOfFriendRequests = await FriendService.getFriendRequests()
+      if (!isEmpty(listOfFriendRequests)){
+        alert(`You have ${listOfFriendRequests.length} friend request pending...`)
+      }
     }
 
     EventBus.on('logout', () => {
