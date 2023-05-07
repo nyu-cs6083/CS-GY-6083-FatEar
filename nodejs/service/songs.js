@@ -6,7 +6,7 @@ const InternalServerError = require('../errors/internalServerError');
 const getRecommendedSongsForCurrentUser = async (user) => {
 
   try {
-    const recommendedSongs =  await db.getDBObject() .query(`SELECT DISTINCT * FROM rateSong NATURAL JOIN song `+
+    const recommendedSongs =  await db.getDBObject() .query(`SELECT DISTINCT * FROM rateSong NATURAL JOIN song NATURAL JOIN artistPerformsSong NATURAL JOIN artist `+
                                                     `WHERE rateSong.username IN (SELECT user2 FROM friend WHERE acceptStatus = 'Accepted' AND user1 = "${user}" UNION SELECT  user1 FROM friend WHERE acceptStatus = "Accepted" AND user2 = "${user}" UNION SELECT followed FROM follows WHERE follower = "${user}") ` + 
                                                     `AND rateSong.stars >= 4 ` +
                                                     `GROUP BY rateSong.username ` +

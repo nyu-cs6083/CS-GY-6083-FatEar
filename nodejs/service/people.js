@@ -21,7 +21,8 @@ const getPeopleResults = async (firstName, lastName, email) => {
 
     console.log('SELECT * FROM users WHERE ' + filtersQueryString)
 
-   const peopleResults = await db.getDBObject().query('SELECT fname, lname, email, userProfile FROM users WHERE '
+   const peopleResults = await db.getDBObject().query('SELECT fname, lname, email, userProfile, username FROM users' +
+       ' WHERE '
         + filtersQueryString)
 
    console.log(peopleResults)
@@ -158,8 +159,9 @@ const getRatedSongs = async (username) => {
 //  Get user profile by username
 const getProfile = async (username) => {
   try {
-    const results =  await db.getDBObject().query(`SELECT username, fname, lname, numFriends, COUNT(follows.followed) as numFollowers 
-                                                   FROM (SELECT username, fname, lname, COUNT(friend.user2) as numFriends FROM users JOIN friend ON users.username = friend.user1 WHERE users.username = "${username}" AND friend.acceptStatus = 'Accepted' GROUP BY users.username) AS numFriendsTableByUser
+    const results =  await db.getDBObject().query(`SELECT username, fname, lname, numFriends, COUNT(follows.followed) as numFollowers, userProfile, email 
+                                                   FROM (SELECT username, fname, lname, COUNT(friend.user2) as 
+                                                       numFriends, userProfile, email FROM users JOIN friend ON users.username = friend.user1 WHERE users.username = "${username}" AND friend.acceptStatus = 'Accepted' GROUP BY users.username) AS numFriendsTableByUser
                                                    JOIN follows ON numFriendsTableByUser.username = follows.followed GROUP BY username;`
     )
     

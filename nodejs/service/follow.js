@@ -31,10 +31,10 @@ const follow = async (follower, follows) => {
 //  Usecase 3a - Function to get new reviews made by people whom user follows
 const newReviewsByFollowedUsers = async (user) => {
   try {
-    return await db.getDBObject().query(`SELECT users.fname, users.lname, users.username, reviewSong.reviewText, reviewSong.reviewDate, song.title  FROM 
+    return await db.getDBObject().query(`SELECT * FROM (SELECT users.fname, users.lname, users.username, reviewSong.reviewText, reviewSong.reviewDate, song.title, song.songID  FROM 
     reviewSong NATURAL JOIN 
 song NATURAL JOIN users ` +
-        `WHERE username IN ( SELECT followed FROM follows WHERE follower = "${user}") AND reviewDate >= (SELECT lastlogin FROM  users WHERE username = "${user}") ORDER BY reviewDate DESC;`);
+        `WHERE username IN ( SELECT followed FROM follows WHERE follower = "${user}") AND reviewDate >= (SELECT lastlogin FROM  users WHERE username = "${user}") ORDER BY reviewDate DESC) as newReviewsByFollows NATURAL JOIN artistPerformsSong JOIN (SELECT artist.fname as artistFname, artist.lname as artistLname, artist.artistID FROM artist) as artistNames ON artistPerformsSong.artistID = artistNames.artistID;`);
 
   } catch (e) {
 
