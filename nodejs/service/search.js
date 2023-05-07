@@ -13,8 +13,15 @@ const getSearchResults = async (song, artist, album, genre, songRating) => {
     }
     if (artist){
       const artistFullName = artist.split(' ')
-      filters.push(`artist.fname = "${artistFullName[0]}" AND artist.lname = "${artistFullName[1]}"`)
+      if (artistFullName[0]){
+        filters.push(`artist.fname LIKE "%${artistFullName[0]}%"`)
+      }
+
+      if (artistFullName[1]){
+        filters.push(`artist.lname LIKE "%${artistFullName[1]}%"`)
+      }
     }
+
     if (album) {
       albumQuery = ' NATURAL JOIN songInAlbum ' +
           'NATURAL JOIN album '
@@ -32,6 +39,10 @@ const getSearchResults = async (song, artist, album, genre, songRating) => {
     }
 
     const filtersQueryString = filters.join(' AND ')
+    console.log('SELECT * FROM song NATURAL JOIN artistPerformsSong NATURAL' +
+        ' JOIN artist ' + albumQuery + genreQuery + songRatingQuery
+        + ' WHERE '
+        + filtersQueryString)
     const searchResults = await db.getDBObject().query('SELECT * FROM song NATURAL JOIN artistPerformsSong NATURAL' +
         ' JOIN artist ' + albumQuery + genreQuery + songRatingQuery
         + ' WHERE '

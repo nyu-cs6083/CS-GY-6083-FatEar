@@ -13,19 +13,10 @@ export const SongModal = (props) => {
 
     // Nigel
     useEffect(async()=>{
-            // console.log(song)
-            const ratings = await RatingService.getRating(song.songID)
-            // console.log(ratings)
-            setSongRatings(ratings[0])
-
-    },[])
-
-    useEffect(async()=>{
-        console.log(song)
+        const ratings = await RatingService.getRating(song.songID)
+        setSongRatings(ratings[0])
         const reviews = await ReviewService.getReview(song.songID)
-        console.log(reviews)
         setSongReviews(reviews)
-
     },[])
 
 
@@ -43,8 +34,10 @@ export const SongModal = (props) => {
 
     const handleSubmitSongReview = async () => {
         await ReviewService.postReview(newSongReview, song.songID)
+        const updatedReviews = await ReviewService.getReview(song.songID)
+        setSongReviews(updatedReviews)
     }
-
+console.log(songReviews)
     return (
         <div style={{
             left: 0,
@@ -83,11 +76,7 @@ export const SongModal = (props) => {
                         <span>Release Date: {song.releaseDate.slice(0,10)}</span>
                         <span>Song URL: <a href={song.songURL}>Listen</a></span>
                         <span>Artist URL: <a href={song.artistURL}>Learn More</a></span>
-                        {/*Need to get song rating for this song*/}
                         <h4 style={{marginTop: '1rem'}}>Average Song Rating:{!isEmpty(songRatings) && songRatings.avgRating}</h4>
-                        {/*Nigel: frontend trigger for rating a song and reviewing a song*/}
-                        {/* treat the rate button as a front end trigger and add an input box next to it that*/}
-                        {/* the rate button sends the value from to the backend.*/}
                         <div>
                             <input  id={song.songID}
                                     name="songRatingInput"
@@ -107,16 +96,11 @@ export const SongModal = (props) => {
                         border: '2px solid cornflowerblue'
                     }}>
                         <h4>Song Reviews</h4>
-                        <p>{!isEmpty(songReviews) && songReviews.map((res, idx) => {
-                        return (<tr key={idx}>
-                            <td>{res.reviewText}</td>
+                        <p>{!isEmpty(songReviews) ? songReviews.map((res, idx) => {
+                        return (<tr key={idx} style={{border: 'none'}}>
+                            <td style={{border: 'none'}}>{res.reviewText}<span style={{color: 'orange'}}>by {res.fname} {res.lname}</span></td>
                         </tr>)
-                        })}</p>
-                        {/*
-                        <p>Amazing song...</p>
-                        <p>Amazing song...</p>
-                        <p>Amazing song...</p>
-                        */}
+                        }) : <span>There are no song reviews made for this song</span>}</p>
                         <h5 style={{marginTop: '1rem'}}>Add Review Here</h5>
                         <div style={{display: 'flex', flexDirection: 'column'}}>
                             <input  style={{width: '100%', height: '5rem'}}
@@ -127,12 +111,6 @@ export const SongModal = (props) => {
                                     onChange={handleSongReviewChange} />
                             <button onClick={handleSubmitSongReview}>Submit Review</button>
                         </div>
-                        {/*
-                        <div style={{display: 'flex', flexDirection: 'column'}}>
-                            <input style={{width: '100%', height: '5rem'}} />
-                            <button>Submit Review</button>
-                        </div>
-                        */}
                     </div>
                 </div>
 

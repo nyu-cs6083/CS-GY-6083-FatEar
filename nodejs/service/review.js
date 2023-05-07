@@ -38,8 +38,8 @@ const getSongReview = async (song) => {
     const review = await db
       .getDBObject()
       .query(
-        'SELECT songID, reviewText FROM ?? WHERE songID = ?',
-        [db.ReviewSongTable, song]
+        'SELECT fname, lname, reviewText, reviewDate FROM ?? NATURAL JOIN ?? WHERE songID = ?',
+        [db.ReviewSongTable, db.UserTable, song]
       );
     if (review.length == 0) {
       throw new Error('Song reviews not found');
